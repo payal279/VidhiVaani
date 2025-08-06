@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Constitution Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef6ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .chat-container {
+      width: 500px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .chat-box {
+      height: 500px;
+      padding: 15px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .input-area {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    a {
+      color: #007BFF;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-box" id="chat-box"></div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Ask about Indian Constitution..." onkeydown="if(event.key === 'Enter') sendMessage()">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = "YOUR_OPENAI_API_KEY"; // Replace with your real OpenAI API key
+
+    async function sendMessage() {
+      const inputBox = document.getElementById("user-input");
+      const userInput = inputBox.value.trim();
+      if (!userInput) return;
+
+      addMessage("You", userInput);
+      inputBox.value = "";
+
+      addMessage("Bot", "Typing...");
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are a helpful legal assistant that answers questions about the Indian Constitution. Provide reliable, simple answers and refer to india.gov.in or indiacode.nic.in if needed." },
+            { role: "user", content: userInput }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      const botReply = data.choices?.[0]?.message?.content || "Sorry, I couldn't get a response.";
+
+      // Remove "Typing..." and show real reply
+      removeLastBotMessage();
+      addMessage("Bot", botReply);
+    }
+
+    function addMessage(sender, message) {
+      const chatBox = document.getElementById("chat-box");
+      const messageElement = document.createElement("div");
+      messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+      chatBox.appendChild(messageElement);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function removeLastBotMessage() {
+      const chatBox = document.getElementById("chat-box");
+      const messages = chatBox.querySelectorAll("div");
+      if (messages.length > 0) {
+        const last = messages[messages.length - 1];
+        if (last.innerText.startsWith("Bot: Typing")) {
+          chatBox.removeChild(last);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
