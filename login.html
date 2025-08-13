@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIDHI VAANI – Login</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      background: linear-gradient(to bottom, #ff9933, #ffffff, #138808);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .login-container {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      width: 350px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: bold;
+      font-family: 'Georgia', serif;
+      color: black;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+    .tagline {
+      font-size: 16px;
+      font-weight: bold;
+      color: #444;
+      margin-bottom: 25px;
+      font-family: 'Georgia', serif;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+      background-color: #0077b6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background-color: #005f8a;
+    }
+    .secondary {
+      background-color: white;
+      color: #0077b6;
+      border: 1px solid #0077b6;
+    }
+    .secondary:hover {
+      background-color: #0077b6;
+      color: white;
+    }
+    .signup-text {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+    .signup-buttons {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .signup-buttons .btn {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h1>VIDHI VAANI</h1>
+    <p class="tagline">Your Voice of Justice</p>
+
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Enter Email or Phone" required>
+      <input type="password" id="password" placeholder="Enter Password" required>
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <p class="signup-text">Don't have an account?</p>
+    <div class="signup-buttons">
+      <a href="signup-user.html" class="btn secondary">User</a>
+      <a href="signup-lawyer.html" class="btn secondary">Lawyer</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      let username = document.getElementById("username").value;
+      let password = document.getElementById("password").value;
+
+      if (username && password) {
+        alert("Login successful!");
+        window.location.href = "chat.html";
+      } else {
+        alert("No account found! Please sign up first.");
+        window.location.href = "signup-user.html"; 
+      }
+    });
+  </script>
+
+</body>
+</html>
+
+

@@ -2,114 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VIDHI VAANI – Chatbot UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Groq Chatbot</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom, #ff9933, #ffffff, #138808 );
+      font-family: Arial, sans-serif;
+      background: #1b1b1b;
+      color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+      margin: 0;
     }
-
-    .wrapper {
-      background: white;
-      width: 400px;
-      height: 600px;
-      border-radius: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      background: #2a2a2a;
+      border-radius: 10px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
-
     .header {
-      background-color: #184862;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 24px;
+      padding: 10px;
+      background: #3a3a3a;
       font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    .description {
-      padding: 15px;
-      font-size: 14px;
-      color: #333;
       text-align: center;
-      border-bottom: 1px solid #ccc;
     }
-
-    .fake-messages {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      font-size: 14px;
-      color: #888;
+    .api-key-box {
+      padding: 8px;
+      background: #252525;
       display: flex;
-      justify-content: center;
-      align-items: center;
+      gap: 5px;
     }
-
-    .input-section {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ccc;
-    }
-
-    .input-section input {
+    .api-key-box input {
       flex: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      font-size: 14px;
-    }
-
-    .input-section button {
-      padding: 10px 16px;
-      margin-left: 10px;
-      background-color:  #184862;
-      color: white;
+      padding: 5px;
       border: none;
-      border-radius: 20px;
-      cursor: pointer;
+      border-radius: 5px;
+      outline: none;
     }
-
-    .voice-icon {
-      position: absolute;
-      top: 28px;
-      right: 70px;
-      font-size: 18px;
+    .messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .message {
+      padding: 8px 12px;
+      border-radius: 8px;
+      max-width: 80%;
+      white-space: pre-wrap;
+    }
+    .user {
+      align-self: flex-end;
+      background: #4f8cff;
+      color: white;
+    }
+    .bot {
+      align-self: flex-start;
+      background: #444;
+    }
+    .input-box {
+      display: flex;
+      padding: 8px;
+      background: #252525;
+    }
+    .input-box input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+    }
+    .input-box button {
+      padding: 10px;
+      margin-left: 5px;
+      background: #4f8cff;
+      border: none;
+      border-radius: 5px;
       color: white;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-
-  <div class="wrapper">
-    <div class="header">
-      VIDHI VAANI
-      <span class="voice-icon">🎤</span>
+  <div class="chat-container">
+    <div class="header">Groq Chatbot</div>
+    <div class="api-key-box">
+      <input type="password" id="apiKey" placeholder="Enter Groq API Key (gsk_...)" />
+      <button onclick="saveKey()">Save</button>
     </div>
-
-    <div class="description">
-      Ask your questions<br>
-    </div>
-
-    <div class="fake-messages">
-      Chatbot ready. Waiting for your question...
-    </div>
-
-    <div class="input-section">
-      <input type="text" placeholder="Type your question...">
-      <button>Send</button>
+    <div class="messages" id="messages"></div>
+    <div class="input-box">
+      <input type="text" id="userInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
     </div>
   </div>
 
+  <script>
+    const messagesDiv = document.getElementById("messages");
+    const userInput = document.getElementById("userInput");
+    const apiKeyInput = document.getElementById("apiKey");
+
+    // Load saved key from browser storage
+    apiKeyInput.value = localStorage.getItem("GROQ_API_KEY") || "";
+
+    function saveKey() {
+      localStorage.setItem("GROQ_API_KEY", apiKeyInput.value.trim());
+      alert("API Key saved in your browser.");
+    }
+
+    function addMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.className = 'message ${sender}';
+      msg.textContent = text;
+      messagesDiv.appendChild(msg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) return alert("Enter your Groq API Key first!");
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      userInput.value = "";
+
+      addMessage("Thinking...", "bot");
+
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ${apiKey}'
+          },
+          body: JSON.stringify({
+            model: "llama3-8b-8192", // You can change to another Groq-supported model
+            messages: [
+              { role: "system", content: "You are a helpful assistant." },
+              { role: "user", content: text }
+            ],
+            temperature: 0.7
+          })
+        });
+
+        const data = await response.json();
+        messagesDiv.lastChild.remove(); // Remove "Thinking..." bubble
+        addMessage(data.choices?.[0]?.message?.content || "No response", "bot");
+      } catch (err) {
+        messagesDiv.lastChild.remove();
+        addMessage("Error: " + err.message, "bot");
+      }
+    }
+  </script>
 </body>
 </html>
